@@ -3,13 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GoogleGenAI } from "@google/genai";
-
 export class GeminiService {
-  private ai: GoogleGenAI;
+  private proxyUrl: string;
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+    this.proxyUrl = "http://localhost:3001/api/generate-image";
   }
 
   async generatePixelArt(prompt: string, angle: string = "front", pose: string = "idle", resolution: number = 256, frameCount: number = 1) {
@@ -26,22 +24,30 @@ export class GeminiService {
            Style: ${resolution}x${resolution} pixel art sprite, high detail, clean lines, limited color palette, flat shading, 
            centered on a solid white background, game asset style, high contrast.`;
 
-      const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [{ text: enhancedPrompt }],
+      const response = await fetch(this.proxyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        config: {
-          imageConfig: {
-            aspectRatio: "1:1",
+        body: JSON.stringify({
+          prompt: enhancedPrompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: '1:1',
           },
-        },
+        }),
       });
 
-      for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`API Error: ${JSON.stringify(errorData)}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.generatedImages && data.generatedImages.length > 0) {
+        const imageData = data.generatedImages[0].image;
+        return `data:image/png;base64,${imageData}`;
       }
       throw new Error("No image data returned from Gemini");
     } catch (error) {
@@ -61,22 +67,30 @@ export class GeminiService {
            Style: 128x128 pixel art tiles, high detail, top-down view, repeating patterns, clean edges, 
            solid white background separating tiles, retro game style.`;
 
-      const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [{ text: enhancedPrompt }],
+      const response = await fetch(this.proxyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        config: {
-          imageConfig: {
-            aspectRatio: "1:1",
+        body: JSON.stringify({
+          prompt: enhancedPrompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: '1:1',
           },
-        },
+        }),
       });
 
-      for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`API Error: ${JSON.stringify(errorData)}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.generatedImages && data.generatedImages.length > 0) {
+        const imageData = data.generatedImages[0].image;
+        return `data:image/png;base64,${imageData}`;
       }
       throw new Error("No image data returned from Gemini");
     } catch (error) {
@@ -93,22 +107,30 @@ export class GeminiService {
       Style: High detail, clean lines, limited color palette, flat shading, 
       centered on a solid white background, game asset style, high contrast.`;
 
-      const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [{ text: enhancedPrompt }],
+      const response = await fetch(this.proxyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        config: {
-          imageConfig: {
-            aspectRatio: "1:1",
+        body: JSON.stringify({
+          prompt: enhancedPrompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: '1:1',
           },
-        },
+        }),
       });
 
-      for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`API Error: ${JSON.stringify(errorData)}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.generatedImages && data.generatedImages.length > 0) {
+        const imageData = data.generatedImages[0].image;
+        return `data:image/png;base64,${imageData}`;
       }
       throw new Error("No image data returned from Gemini");
     } catch (error) {
